@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useTheme } from "@emotion/react";
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -17,11 +18,12 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutlined";
-
+import { motion } from "framer-motion"
 import Dialog from "@mui/material/Dialog";
 import { Close } from "@mui/icons-material";
 import ProuductDetails from "./ProuductDetails";
 import { useGetproductByNameQuery } from "../../Redux/product";
+
 const Main = () => {
   const [open, setOpen] = React.useState(false);
   const allProductsAPI = "products?populate=*";
@@ -40,8 +42,11 @@ const [myData, setmyData] = useState(allProductsAPI)
   const [alignment, setAlignment] = React.useState("left");
   const theme = useTheme();
   const handleAlignment = (event, newValue) => {
-    setAlignment(newValue)
-    setmyData(newValue);
+    if (newValue !== null){
+      setAlignment(newValue)
+      setmyData(newValue);
+    }
+
   };
 
 
@@ -49,13 +54,21 @@ const [myData, setmyData] = useState(allProductsAPI)
     myData
   );
 
+const [clickedProduct, setclickedProduct] = useState({});
+
   if(error){
     return(
+      <Container sx={{py:11,textAlign:"center"}}>
       <Typography variant="h6">
-      {error.
+        {error.
 // @ts-ignore
-      message}
+        error}
     </Typography>
+      <Typography variant="h6">
+        Please try again later
+    </Typography>
+      </Container>
+
     )
 
   }
@@ -125,11 +138,20 @@ const [myData, setmyData] = useState(allProductsAPI)
         justifyContent={"space-between"}
       >
         {isLoading
-          ? "loading..."
+          ? <Container sx={{py:11,textAlign:"center"}}>
+          <CircularProgress />
+          </Container>
           : data.data.map((item) => {
               return (
                 <Card
-                  key={item.id}
+                component={motion.section}
+                layout
+                initial={{ transform: "scale(0)" }}
+                animate={{ transform: "scale(1)" }}
+                transition={{duration:1.6,type:"spring",stiffness:50}}
+                  
+                
+                key={item.id}
                   sx={{
                     maxWidth: 333,
                     mt: 6,
@@ -165,7 +187,10 @@ const [myData, setmyData] = useState(allProductsAPI)
 
                   <CardActions sx={{ justifyContent: "space-between" }}>
                     <Button
-                      onClick={handleClickOpen}
+                      onClick={()=>{
+                        handleClickOpen();
+                        setclickedProduct(item);
+                      }}
                       sx={{ textTransform: "capitalize" }}
                       size="large"
                     >
@@ -206,7 +231,7 @@ const [myData, setmyData] = useState(allProductsAPI)
         >
           <Close />
         </IconButton>
-        <ProuductDetails />
+        <ProuductDetails clickedProduct={clickedProduct}/>
       </Dialog>
     </Container>
   );

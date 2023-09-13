@@ -16,7 +16,7 @@ const Footer = () => {
           variant="text"
           color="primary"
         >
-          Ali Hassan
+          Esam Muhaisen
         </Button>
         ©2023
         </Typography>
